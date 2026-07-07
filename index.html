@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Questrial&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Questrial', sans-serif;
+    background: #1C1C1C;
+    color: #fff;
+    padding: 40px 24px 64px;
+  }
+
+  .fc { max-width: 560px; margin: 0 auto; }
+
+  /* Text inputs */
+  .field { margin-bottom: 16px; }
+
+  input[type="text"],
+  input[type="email"],
+  input[type="tel"],
+  textarea,
+  select {
+    width: 100%;
+    background: transparent;
+    border: 1px solid #ffffff;
+    color: #fff;
+    padding: 14px 16px;
+    font-size: 15px;
+    font-family: inherit;
+    outline: none;
+    border-radius: 0;
+    appearance: none;
+    transition: border-color 0.2s;
+  }
+
+  input::placeholder, textarea::placeholder { color: rgba(255,255,255,0.7); }
+  input:focus, textarea:focus, select:focus { border-color: #F5C438; }
+
+  select option { background: #1C1C1C; color: #fff; }
+  textarea { resize: vertical; min-height: 110px; }
+
+  /* Section question label */
+  .q-label {
+    display: block;
+    font-size: 15px;
+    font-weight: 400;
+    color: #fff;
+    margin-bottom: 14px;
+  }
+
+  /* Divider */
+  .divider { height: 1px; background: rgba(255,255,255,0.1); margin: 28px 0; }
+
+  /* Custom checkboxes & radios */
+  .check-list { display: flex; flex-direction: column; gap: 12px; }
+
+  .check-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .check-item input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .check-box {
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    border: 1px solid rgba(255,255,255,0.4);
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color 0.15s;
+  }
+
+  .check-item input:checked ~ .check-box {
+    border-color: #F5C438;
+  }
+
+  .check-item input:checked ~ .check-box::after {
+    content: '';
+    display: block;
+    width: 10px;
+    height: 10px;
+    background: #F5C438;
+    clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+  }
+
+  .check-item.radio .check-box { border-radius: 50%; }
+
+  .check-item.radio input:checked ~ .check-box::after {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    clip-path: none;
+  }
+
+  .check-item span {
+    font-size: 15px;
+    font-weight: 400;
+    color: rgba(255,255,255,0.85);
+    line-height: 1.4;
+  }
+
+  /* Pages */
+  .page { display: block; }
+  .page.hidden { display: none; }
+
+  /* Step indicator */
+  .step-indicator {
+    margin-bottom: 32px;
+  }
+
+  .step-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+
+  .step-num {
+    font-size: 12px;
+    color: rgba(255,255,255,0.4);
+    letter-spacing: 0.04em;
+  }
+
+  .step-track {
+    height: 2px;
+    background: rgba(255,255,255,0.12);
+  }
+
+  .step-fill {
+    height: 2px;
+    background: #F5C438;
+    transition: width 0.4s ease;
+  }
+
+  .step-title {
+    font-size: 17px;
+    color: #fff;
+    margin-top: 12px;
+  }
+
+  /* Submit / Next button */
+  .btn-submit {
+    width: 100%;
+    padding: 17px;
+    background: #F5C438;
+    color: #1C1C1C;
+    font-size: 15px;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.2s, opacity 0.2s;
+    margin-top: 8px;
+  }
+
+  .btn-submit:hover { background: #e6b82e; }
+  .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; }
+
+  /* Back link */
+  .btn-back {
+    display: block;
+    background: none;
+    border: none;
+    color: rgba(255,255,255,0.45);
+    font-family: inherit;
+    font-size: 13px;
+    cursor: pointer;
+    margin-top: 14px;
+    padding: 0;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .btn-back:hover { color: rgba(255,255,255,0.75); }
+
+  /* Success */
+  .success {
+    display: none;
+    text-align: center;
+    padding: 80px 20px;
+  }
+
+  .success h3 { font-size: 26px; font-weight: 700; margin-bottom: 12px; }
+  .success p { color: rgba(255,255,255,0.55); font-size: 15px; line-height: 1.6; }
+
+  /* Error */
+  .form-error {
+    display: none;
+    color: #ff6b6b;
+    font-size: 13px;
+    margin-top: 12px;
+    text-align: center;
+  }
+
+  @media (max-width: 500px) {
+    body { padding: 24px 16px 48px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="fc">
+  <form id="cheese-form">
+    <input type="hidden" name="access_key" value="2959153a-fbc6-4171-a171-97f582c8b457">
+    <input type="hidden" name="subject" value="New Strategy Call Request — Cheese Marketing">
+    <input type="hidden" name="from_name" value="Cheese Website">
+    <input type="checkbox" name="botcheck" style="display:none" tabindex="-1">
+
+    <!-- PAGE 1 -->
+    <div class="page" id="page1">
+
+      <div class="step-indicator">
+        <div class="step-meta">
+          <span class="step-num">Step 1 of 2</span>
+          <span class="step-num">Your details</span>
+        </div>
+        <div class="step-track"><div class="step-fill" style="width:50%"></div></div>
+      </div>
+
+      <div class="field">
+        <input type="text" name="name" required placeholder="Full name *">
+      </div>
+
+      <div class="field">
+        <input type="text" name="business_name" required placeholder="Business name *">
+      </div>
+
+      <div class="field">
+        <input type="email" name="email" required placeholder="Email *">
+      </div>
+
+      <div class="field">
+        <input type="tel" name="phone" required placeholder="Phone *">
+      </div>
+
+      <div class="field">
+        <input type="text" name="business_type" required placeholder="Type of business (e.g. restaurant, consulting...) *">
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="field">
+        <span class="q-label">Which service(s) are you interested in? *</span>
+        <div class="check-list">
+          <label class="check-item">
+            <input type="checkbox" name="service_branding" value="Branding &amp; Brand Architecture">
+            <span class="check-box"></span>
+            <span>Branding &amp; Brand Architecture</span>
+          </label>
+          <label class="check-item">
+            <input type="checkbox" name="service_website" value="Website &amp; Digital Experience">
+            <span class="check-box"></span>
+            <span>Website &amp; Digital Experience</span>
+          </label>
+          <label class="check-item">
+            <input type="checkbox" name="service_marketing" value="Strategic Marketing Support &amp; Guidance">
+            <span class="check-box"></span>
+            <span>Strategic Marketing Support &amp; Guidance</span>
+          </label>
+          <label class="check-item">
+            <input type="checkbox" name="service_content" id="cc-trigger" value="Content Creation (Social Media &amp; Web)">
+            <span class="check-box"></span>
+            <span>Content Creation (Social Media &amp; Web)</span>
+          </label>
+          <label class="check-item">
+            <input type="checkbox" name="service_paidads" value="Paid Ads (Meta &amp; Google)">
+            <span class="check-box"></span>
+            <span>Paid Ads (Meta &amp; Google)</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="field">
+        <textarea name="message" placeholder="Anything else you'd like us to know?"></textarea>
+      </div>
+
+      <div class="field">
+        <select name="referral">
+          <option value="" disabled selected>How did you hear about us?</option>
+          <option value="Instagram">Instagram</option>
+          <option value="TikTok">TikTok</option>
+          <option value="Google">Google</option>
+          <option value="LinkedIn">LinkedIn</option>
+          <option value="Referral">Referral / Word of mouth</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+
+      <button type="button" class="btn-submit" id="btn-p1">Book Your Strategy Call</button>
+    </div>
+
+    <!-- PAGE 2 — Content Creation extra questions -->
+    <div class="page hidden" id="page2">
+
+      <div class="step-indicator">
+        <div class="step-meta">
+          <span class="step-num">Step 2 of 2</span>
+          <span class="step-num">Content creation</span>
+        </div>
+        <div class="step-track"><div class="step-fill" style="width:100%"></div></div>
+        <div class="step-title">A few more questions</div>
+      </div>
+
+      <div class="field">
+        <span class="q-label">What are you hoping to achieve with content? *</span>
+        <div class="check-list">
+          <label class="check-item">
+            <input type="checkbox" name="content_goal_awareness" value="More brand awareness &amp; visibility">
+            <span class="check-box"></span>
+            <span>More brand awareness &amp; visibility</span>
+          </label>
+          <label class="check-item">
+            <input type="checkbox" name="content_goal_sales" value="Generate more enquiries or sales">
+            <span class="check-box"></span>
+            <span>Generate more enquiries or sales</span>
+          </label>
+          <label class="check-item">
+            <input type="checkbox" name="content_goal_system" value="A consistent content system">
+            <span class="check-box"></span>
+            <span>A consistent content system</span>
+          </label>
+          <label class="check-item">
+            <input type="checkbox" name="content_goal_showcase" value="Better showcase what we already do well">
+            <span class="check-box"></span>
+            <span>Better showcase what we already do well</span>
+          </label>
+          <label class="check-item">
+            <input type="checkbox" name="content_goal_figuring" value="Still figuring it out — let's talk it through">
+            <span class="check-box"></span>
+            <span>Still figuring it out — let's talk it through</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="field">
+        <span class="q-label">Which platforms are you active on, or want to be on? *</span>
+        <div class="check-list">
+          <label class="check-item">
+            <input type="checkbox" name="platform_instagram" value="Instagram">
+            <span class="check-box"></span>
+            <span>Instagram</span>
+          </label>
+          <label class="check-item">
+            <input type="checkbox" name="platform_tiktok" value="TikTok">
+            <span class="check-box"></span>
+            <span>TikTok</span>
+          </label>
+          <label class="check-item">
+            <input type="checkbox" name="platform_facebook" value="Facebook">
+            <span class="check-box"></span>
+            <span>Facebook</span>
+          </label>
+          <label class="check-item">
+            <input type="checkbox" name="platform_linkedin" value="LinkedIn">
+            <span class="check-box"></span>
+            <span>LinkedIn</span>
+          </label>
+          <label class="check-item">
+            <input type="checkbox" name="platform_other" value="Other">
+            <span class="check-box"></span>
+            <span>Other</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="field">
+        <input type="text" name="social_accounts" placeholder="Your handles or links (optional)">
+      </div>
+
+      <div class="field">
+        <span class="q-label">Do you have existing photos/videos we could use? *</span>
+        <div class="check-list">
+          <label class="check-item radio">
+            <input type="radio" name="existing_media" value="Yes, plenty of material available">
+            <span class="check-box"></span>
+            <span>Yes, plenty of material available</span>
+          </label>
+          <label class="check-item radio">
+            <input type="radio" name="existing_media" value="Some, but not organised">
+            <span class="check-box"></span>
+            <span>Some, but not organised</span>
+          </label>
+          <label class="check-item radio">
+            <input type="radio" name="existing_media" value="Almost none — we'd need to film from scratch">
+            <span class="check-box"></span>
+            <span>Almost none — we'd need to film from scratch</span>
+          </label>
+        </div>
+      </div>
+
+      <button type="submit" class="btn-submit" id="btn-p2">Book Your Strategy Call</button>
+      <button type="button" class="btn-back" id="btn-back">← Go back</button>
+    </div>
+
+  </form>
+
+  <div class="success" id="success">
+    <h3>You're booked in.</h3>
+    <p>Thanks for reaching out — we'll be in touch shortly<br>to confirm your strategy call.</p>
+  </div>
+</div>
+
+<script>
+  var ccTrigger = document.getElementById('cc-trigger');
+  var btnP1     = document.getElementById('btn-p1');
+  var btnBack   = document.getElementById('btn-back');
+  var page1     = document.getElementById('page1');
+  var page2     = document.getElementById('page2');
+  var form      = document.getElementById('cheese-form');
+  var btnP2     = document.getElementById('btn-p2');
+  var success   = document.getElementById('success');
+
+  // Update button label when Content Creation is toggled
+  ccTrigger.addEventListener('change', function() {
+    btnP1.textContent = this.checked ? 'Next' : 'Book Your Strategy Call';
+  });
+
+  // Page 1 button — either go to page 2 or submit
+  btnP1.addEventListener('click', function() {
+    if (ccTrigger.checked) {
+      // Validate page 1 required fields before advancing
+      var required = page1.querySelectorAll('[required]');
+      var valid = true;
+      required.forEach(function(el) {
+        if (!el.value.trim()) { el.focus(); valid = false; }
+      });
+      if (!valid) return;
+
+      page1.classList.add('hidden');
+      page2.classList.remove('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+      // No content creation — submit directly
+      form.requestSubmit ? form.requestSubmit() : form.submit();
+    }
+  });
+
+  // Back button
+  btnBack.addEventListener('click', function() {
+    page2.classList.add('hidden');
+    page1.classList.remove('hidden');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
+  // Form submission (triggered from page 2 button or page 1 direct submit)
+  var formError = document.createElement('p');
+  formError.style.cssText = 'display:none;color:#ff6b6b;font-size:13px;margin-top:12px;text-align:center;';
+  page2.appendChild(formError);
+
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+    btnP2.disabled = true;
+    btnP2.textContent = 'Sending...';
+    formError.style.display = 'none';
+
+    fetch('https://api.web3forms.com/submit', {
+      method: 'POST',
+      body: new FormData(form)
+    })
+    .then(function(res) { return res.json(); })
+    .then(function(json) {
+      if (json.success) {
+        form.style.display = 'none';
+        success.style.display = 'block';
+      } else {
+        btnP2.disabled = false;
+        btnP2.textContent = 'Book Your Strategy Call';
+        formError.style.display = 'block';
+        formError.textContent = 'Something went wrong. Please try again or email us at hello@cheesemarketing.com.au';
+      }
+    })
+    .catch(function() {
+      btnP2.disabled = false;
+      btnP2.textContent = 'Book Your Strategy Call';
+      formError.style.display = 'block';
+      formError.textContent = 'Something went wrong. Please try again or email us at hello@cheesemarketing.com.au';
+    });
+  });
+
+  // Handle direct submit from page 1 (no CC selected)
+  // We need a separate error element on page 1 too
+  var formErrorP1 = document.createElement('p');
+  formErrorP1.style.cssText = 'display:none;color:#ff6b6b;font-size:13px;margin-top:12px;text-align:center;';
+  page1.appendChild(formErrorP1);
+
+  // Override submit for page-1-only flow
+  form.addEventListener('submit', function() {
+    // If page 2 is hidden, this was triggered from page 1 direct flow
+    // The main submit handler above covers both cases
+  });
+</script>
+<script src="https://cdn.jsdelivr.net/npm/iframe-resizer@4.3.9/js/iframeResizer.contentWindow.min.js"></script>
+</body>
+</html>
