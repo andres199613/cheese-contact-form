@@ -250,19 +250,19 @@
 
       <div class="field-row">
         <div class="field">
-          <input type="text" name="business_name" required placeholder="Business name *">
+          <input type="email" name="email" required placeholder="Email *">
         </div>
         <div class="field">
-          <input type="text" name="business_type" required placeholder="Type of business *">
+          <input type="text" name="phone" required placeholder="Phone *">
         </div>
       </div>
 
       <div class="field-row">
         <div class="field">
-          <input type="email" name="email" required placeholder="Email *">
+          <input type="text" name="business_name" required placeholder="Business name *">
         </div>
         <div class="field">
-          <input type="text" name="phone" required placeholder="Phone *">
+          <input type="text" name="business_type" required placeholder="Type of business (e.g. restaurant, consulting...) *">
         </div>
       </div>
 
@@ -315,6 +315,21 @@
           <option value="Referral">Referral / Word of mouth</option>
           <option value="Other">Other</option>
         </select>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="check-list" style="margin-bottom: 20px;">
+        <label class="check-item">
+          <input type="checkbox" name="consent_contact" required value="yes">
+          <span class="check-box"></span>
+          <span>I agree to be contacted about my enquiry and receive booking-related emails. *</span>
+        </label>
+        <label class="check-item">
+          <input type="checkbox" name="consent_marketing" value="yes">
+          <span class="check-box"></span>
+          <span>Yes, send me marketing tips, updates and offers from Cheese. I can unsubscribe anytime.</span>
+        </label>
       </div>
 
       <button type="button" class="btn-submit" id="btn-p1">Book Your Strategy Call</button>
