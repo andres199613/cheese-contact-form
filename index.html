@@ -417,8 +417,9 @@
   </form>
 
   <div class="success" id="success">
-    <h3>You're booked in.</h3>
-    <p>Thanks for reaching out — we'll be in touch shortly<br>to confirm your strategy call.</p>
+    <h3>You're Almost There.</h3>
+    <p>One last step, choose a time and your strategy call is locked in.</p>
+    <button class="btn-submit" id="btn-cal" style="margin-top:28px;">Finish Your Booking</button>
   </div>
 </div>
 
@@ -431,6 +432,12 @@
   var form      = document.getElementById('cheese-form');
   var btnP2     = document.getElementById('btn-p2');
   var success   = document.getElementById('success');
+  var btnCal    = document.getElementById('btn-cal');
+
+  btnCal.addEventListener('click', function() {
+    window.parent.postMessage({ type: 'cheese-open-cal', url: 'https://cal.com/cheese-marketing-agency/strategycall' }, '*');
+    window.open('https://cal.com/cheese-marketing-agency/strategycall', '_blank');
+  });
 
   // Update button label when Content Creation is toggled
   ccTrigger.addEventListener('change', function() {
