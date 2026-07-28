@@ -19,6 +19,17 @@
   /* Text inputs */
   .field { margin-bottom: 16px; }
 
+  /* Two-column row */
+  .field-row {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .field-row .field {
+    flex: 1;
+    margin-bottom: 0;
+  }
+
   input[type="text"],
   input[type="email"],
   input[type="tel"],
@@ -237,20 +248,22 @@
         <input type="text" name="name" required placeholder="Full name *">
       </div>
 
-      <div class="field">
-        <input type="text" name="business_name" required placeholder="Business name *">
+      <div class="field-row">
+        <div class="field">
+          <input type="text" name="business_name" required placeholder="Business name *">
+        </div>
+        <div class="field">
+          <input type="text" name="business_type" required placeholder="Type of business *">
+        </div>
       </div>
 
-      <div class="field">
-        <input type="email" name="email" required placeholder="Email *">
-      </div>
-
-      <div class="field">
-        <input type="tel" name="phone" required placeholder="Phone *">
-      </div>
-
-      <div class="field">
-        <input type="text" name="business_type" required placeholder="Type of business (e.g. restaurant, consulting...) *">
+      <div class="field-row">
+        <div class="field">
+          <input type="email" name="email" required placeholder="Email *">
+        </div>
+        <div class="field">
+          <input type="text" name="phone" required placeholder="Phone *">
+        </div>
       </div>
 
       <div class="divider"></div>
