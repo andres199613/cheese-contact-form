@@ -471,6 +471,44 @@
     window.scrollTo({ top: 0, behavior: 'smooth' });
   });
 
+  function subscribeToKlaviyo(data) {
+    var name = (data.get('name') || '').trim();
+    var parts = name.split(' ');
+    var firstName = parts[0] || '';
+    var lastName = parts.slice(1).join(' ') || '';
+    fetch('https://a.klaviyo.com/client/subscriptions/?company_id=UU3W5w', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'revision': '2023-12-15' },
+      body: JSON.stringify({
+        data: {
+          type: 'subscription',
+          attributes: {
+            custom_source: 'Cheese Contact Form',
+            profile: {
+              data: {
+                type: 'profile',
+                attributes: {
+                  email: data.get('email') || '',
+                  first_name: firstName,
+                  last_name: lastName,
+                  phone_number: data.get('phone') || '',
+                  properties: {
+                    business_name: data.get('business_name') || '',
+                    business_type: data.get('business_type') || '',
+                    referral: data.get('referral') || ''
+                  }
+                }
+              }
+            }
+          },
+          relationships: {
+            list: { data: { type: 'list', id: 'U8f6zh' } }
+          }
+        }
+      })
+    }).catch(function() {});
+  }
+
   // Form submission (triggered from page 2 button or page 1 direct submit)
   var formError = document.createElement('p');
   formError.style.cssText = 'display:none;color:#ff6b6b;font-size:13px;margin-top:12px;text-align:center;';
@@ -489,6 +527,7 @@
     .then(function(res) { return res.json(); })
     .then(function(json) {
       if (json.success) {
+        subscribeToKlaviyo(new FormData(form));
         form.style.display = 'none';
         success.style.display = 'block';
       } else {
